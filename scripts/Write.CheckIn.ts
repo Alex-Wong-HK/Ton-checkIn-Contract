@@ -3,7 +3,8 @@ import { Checkin } from '../wrappers/Checkin';
 import { NetworkProvider, sleep } from '@ton/blueprint';
 import {TonClient, TonClient4} from "@ton/ton";
 import _ from "lodash";
-// Contract : EQA6QvcmlNIwieW7p1eJ1wl8DyuD3gCa-uNzPfp-GHN18Isa
+import {checkinContract} from "../contest/contractConifg";
+// Contract : EQAYSJrkETA-4gHDKk0po_eZ18iuk-fi2E1OgOiWmfpDDat5
 // Wallet : EQDT0o8INIZYa3lOogMWjvMjqKmL2f7_wy3aC78rGRCewSQq
 export async function getSeqNo(provider: NetworkProvider, address: Address) {
     if (await provider.isContractDeployed(address)) {
@@ -67,7 +68,7 @@ export async function awaitConfirmation(fn: () => Promise<boolean>) {
 
 export async function run(provider: NetworkProvider, args: string[]) {
     const ui = provider.ui();
-    const address = Address.parse(args.length > 0 ? args[0] : await ui.input('Check In Contract address'));
+    const address = Address.parse(checkinContract);
     if (!(await provider.isContractDeployed(address))) {
         ui.write(`Error: Contract at address ${address} is not deployed!`);
         return;
@@ -82,7 +83,7 @@ export async function run(provider: NetworkProvider, args: string[]) {
     let bizz:bigint
     do {
         bizz = BigInt(_.random(1,9999999999))
-    } while(await checkin.getGetBizzSigner(bizz) === null);
+    } while(await checkin.getGetBizzSigner(bizz) !== null);
 
     console.log(Number(bizz))
     // 發送交互,
@@ -91,7 +92,7 @@ export async function run(provider: NetworkProvider, args: string[]) {
     const tx = await checkin.send(
         provider.sender(),
         {
-            value: toNano('0.01'),
+            value: toNano('0.05'),
             bounce:true,
         },
         {
@@ -104,9 +105,20 @@ export async function run(provider: NetworkProvider, args: string[]) {
     if (await waitSeqNoChange(provider, provider.sender().address!, seqno)) {
         //檢查 合約中簽到已完成
         if (await awaitConfirmation(async () => {
-            let countChecking = false;
-            let counterAfter = await checkin.getCheckInCount(provider.sender().address!);
-            if(await checkin.getGetBizzSigner(bizz) === provider.sender().address!){
+
+            const bizzSigner = await checkin.getGetBizzSigner(bizz);
+            console.log({
+                bizzSigner,
+                signer: provider.sender().address!,
+                checking:bizzSigner!== null && bizzSigner.equals(provider.sender().address!)
+            })
+            if(bizzSigner!== null && bizzSigner.equals(provider.sender().address!)){
+
+                let counterAfter = await checkin.getCheckInCount(provider.sender().address!);
+                console.log({
+                    counterAfter,
+                    counterBefore
+                })
                 if(counterBefore===null){
                     return Number(counterAfter)=== 1
                 }else{
