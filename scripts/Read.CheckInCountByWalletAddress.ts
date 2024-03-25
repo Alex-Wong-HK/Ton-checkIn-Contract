@@ -11,13 +11,19 @@ export async function run(provider: NetworkProvider, args: string[]) {
     const walletAddress = await ui.input('Target Wallet')
     if (!(await provider.isContractDeployed(_address))) {
         ui.write(`Error: Contract at address ${_address} is not deployed!`);
-        return;
-    }
-    const checkin = provider.open(Checkin.fromAddress(_address));
-    let count = await checkin.getCheckInCount(address(walletAddress));
-    console.log({
+         return;
+      }
+      const checkin = provider.open(Checkin.fromAddress(_address));
+      let count = await checkin.getCheckInCount(address(walletAddress));
+       console.log({
         walletAddress,
-        count
-    })
+          count
+     })
     ui.clearActionPrompt();
 }
+
+
+
+// export async function run(provider: NetworkProvider, args: string[]) {
+//     console.log("Suspended.")
+// }

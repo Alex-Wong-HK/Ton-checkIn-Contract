@@ -4,7 +4,6 @@ import { NetworkProvider, sleep } from '@ton/blueprint';
 import {TonClient, TonClient4} from "@ton/ton";
 import _ from "lodash";
 import {checkinContract} from "../contest/contractConifg";
-// Contract : EQAYSJrkETA-4gHDKk0po_eZ18iuk-fi2E1OgOiWmfpDDat5
 // Wallet : EQDT0o8INIZYa3lOogMWjvMjqKmL2f7_wy3aC78rGRCewSQq
 export async function getSeqNo(provider: NetworkProvider, address: Address) {
     if (await provider.isContractDeployed(address)) {
@@ -77,8 +76,6 @@ export async function run(provider: NetworkProvider, args: string[]) {
     // 獲得交互前的錢包紀錄 和 簽到次數
     let counterBefore = await checkin.getCheckInCount(provider.sender().address!);
     const seqno = await getSeqNo(provider, provider.sender().address!);
-
-
     // Find a unused Bizz
     let bizz:bigint
     do {
@@ -93,12 +90,12 @@ export async function run(provider: NetworkProvider, args: string[]) {
         provider.sender(),
         {
             value: toNano('0.05'),
-            bounce:true,
         },
         {
             $$type: 'CheckInMsg',
             bizz:bizz
         }
+
     );
 
     //檢查 Transition已送出
