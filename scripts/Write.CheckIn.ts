@@ -1,15 +1,16 @@
-import { Address, toNano } from '@ton/core';
-import { Checkin } from '../wrappers/Checkin';
-import { NetworkProvider, sleep } from '@ton/blueprint';
+import {Address, toNano} from '@ton/core';
+import {Checkin} from '../wrappers/Checkin';
+import {NetworkProvider, sleep} from '@ton/blueprint';
 import {TonClient, TonClient4} from "@ton/ton";
 import _ from "lodash";
 import {checkinContract} from "../contest/contractConifg";
+
 // Wallet : EQDT0o8INIZYa3lOogMWjvMjqKmL2f7_wy3aC78rGRCewSQq
 export async function getSeqNo(provider: NetworkProvider, address: Address) {
     if (await provider.isContractDeployed(address)) {
 
-        const lastBlock =(await (provider.api() as TonClient4).getLastBlock())
-        let res = await(provider.api() as TonClient4).runMethod((lastBlock.last.seqno), address, 'seqno');
+        const lastBlock = (await (provider.api() as TonClient4).getLastBlock())
+        let res = await (provider.api() as TonClient4).runMethod((lastBlock.last.seqno), address, 'seqno');
         return res.reader.readNumber();
     } else {
         return 0;
@@ -30,7 +31,8 @@ export async function waitSeqNoChange(provider: NetworkProvider, target: Address
         if (seqnoAfter > previousSeqno) {
             successFlag = 1;
             break;
-        };
+        }
+        ;
     }
     if (successFlag) {
         console.log(` - Sent transaction done successfully`);
@@ -49,7 +51,8 @@ export async function awaitConfirmation(fn: () => Promise<boolean>) {
         let res = false
         try {
             res = await fn()
-        } catch {}
+        } catch {
+        }
 
         if (res) {
             successFlag = 1
@@ -64,7 +67,6 @@ export async function awaitConfirmation(fn: () => Promise<boolean>) {
 }
 
 
-
 export async function run(provider: NetworkProvider, args: string[]) {
     const ui = provider.ui();
     const address = Address.parse(checkinContract);
@@ -77,12 +79,14 @@ export async function run(provider: NetworkProvider, args: string[]) {
     let counterBefore = await checkin.getCheckInCount(provider.sender().address!);
     const seqno = await getSeqNo(provider, provider.sender().address!);
     // Find a unused Bizz
-    let bizz:bigint
+    let bizz: bigint
     do {
-        bizz = BigInt(_.random(1,9999999999))
-    } while(await checkin.getGetBizzSigner(bizz) !== null);
+        bizz = BigInt(_.random(1, 9999999999))
+    } while (await checkin.getGetBizzSigner(bizz) !== null);
 
-    console.log(Number(bizz))
+    console.log({
+        bizz:Number(bizz)
+    })
     // 發送交互,
     // bounce : true -> 失敗回滾機制 ,
     // value : 轉帳數目, 需要大於gas fee, 否則交易失敗
@@ -93,9 +97,8 @@ export async function run(provider: NetworkProvider, args: string[]) {
         },
         {
             $$type: 'CheckInMsg',
-            bizz:bizz
+            bizz: bizz
         }
-
     );
 
     //檢查 Transition已送出
@@ -107,21 +110,21 @@ export async function run(provider: NetworkProvider, args: string[]) {
             console.log({
                 bizzSigner,
                 signer: provider.sender().address!,
-                checking:bizzSigner!== null && bizzSigner.equals(provider.sender().address!)
+                checking: bizzSigner !== null && bizzSigner.equals(provider.sender().address!)
             })
-            if(bizzSigner!== null && bizzSigner.equals(provider.sender().address!)){
+            if (bizzSigner !== null && bizzSigner.equals(provider.sender().address!)) {
 
                 let counterAfter = await checkin.getCheckInCount(provider.sender().address!);
                 console.log({
                     counterAfter,
                     counterBefore
                 })
-                if(counterBefore===null){
-                    return Number(counterAfter)=== 1
-                }else{
+                if (counterBefore === null) {
+                    return Number(counterAfter) === 1
+                } else {
                     return Number(counterBefore) < Number(counterAfter)
                 }
-            }else{
+            } else {
                 return false
             }
         })) {

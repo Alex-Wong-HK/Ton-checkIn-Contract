@@ -1,6 +1,6 @@
-import { Blockchain, SandboxContract, TreasuryContract } from '@ton/sandbox';
+import {Blockchain, SandboxContract, TreasuryContract} from '@ton/sandbox';
 import {address, toNano} from '@ton/core';
-import { Checkin } from '../wrappers/Checkin';
+import {Checkin} from '../wrappers/Checkin';
 import '@ton/test-utils';
 import _ from "lodash";
 
@@ -36,70 +36,70 @@ describe('Checkin', () => {
     });
 
     it('should increase counter', async () => {
-            const increaser = await blockchain.treasury('increaser');
+        const increaser = await blockchain.treasury('increaser');
 
 
-            //Check-in First time
-            let bizz = BigInt(_.random(1,999999999999))
-            const checking = await checkin.send(
-                increaser.getSender(),
-                {
-                    value: toNano('0.05'),
-                },
-                {
-                    $$type: 'CheckInMsg',
-                    bizz:bizz
-                }
-            );
+        //Check-in First time
+        let bizz = BigInt(_.random(1, 999999999999))
+        const checking = await checkin.send(
+            increaser.getSender(),
+            {
+                value: toNano('0.05'),
+            },
+            {
+                $$type: 'CheckInMsg',
+                bizz: bizz
+            }
+        );
 
-            console.log({
-                signer:increaser.getSender().address,
-                checkinCount:await checkin.getCheckInCount(increaser.getSender().address),
-                bizz:{
-                    value:bizz,
-                    signer:await checkin.getGetBizzSigner(bizz)
-                }
-            })
+        console.log({
+            signer: increaser.getSender().address,
+            checkinCount: await checkin.getCheckInCount(increaser.getSender().address),
+            bizz: {
+                value: bizz,
+                signer: await checkin.getGetBizzSigner(bizz)
+            }
+        })
 
-            //Check-in Second time
-            bizz = BigInt(_.random(1,999999999999))
-            await checkin.send(
-                increaser.getSender(),
-                {
-                    value: toNano('0.05'),
-                },
-                {
-                    $$type: 'CheckInMsg',
-                    bizz:bizz
-                }
-            );
-            console.log({
-                signer:increaser.getSender().address,
-                checkinCount:await checkin.getCheckInCount(increaser.getSender().address),
-                bizz:{
-                    value:bizz,
-                    signer:await checkin.getGetBizzSigner(bizz)
-                }
-            })
+        //Check-in Second time
+        bizz = BigInt(_.random(1, 999999999999))
+        await checkin.send(
+            increaser.getSender(),
+            {
+                value: toNano('0.05'),
+            },
+            {
+                $$type: 'CheckInMsg',
+                bizz: bizz
+            }
+        );
+        console.log({
+            signer: increaser.getSender().address,
+            checkinCount: await checkin.getCheckInCount(increaser.getSender().address),
+            bizz: {
+                value: bizz,
+                signer: await checkin.getGetBizzSigner(bizz)
+            }
+        })
 
-            //Check-in Third time ( Use Existed Bizz)
-            const tx = await checkin.send(
-                increaser.getSender(),
-                {
-                    value: toNano('0.05'),
-                },
-                {
-                    $$type: 'CheckInMsg',
-                    bizz:bizz
-                }
-            );
-            console.log({
-                signer:increaser.getSender().address,
-                checkinCount:await checkin.getCheckInCount(increaser.getSender().address),
-                bizz:{
-                    value:bizz,
-                    signer:await checkin.getGetBizzSigner(bizz)
-                }
-            })
+        //Check-in Third time ( Use Existed Bizz)
+        const tx = await checkin.send(
+            increaser.getSender(),
+            {
+                value: toNano('0.05'),
+            },
+            {
+                $$type: 'CheckInMsg',
+                bizz: bizz
+            }
+        );
+        console.log({
+            signer: increaser.getSender().address,
+            checkinCount: await checkin.getCheckInCount(increaser.getSender().address),
+            bizz: {
+                value: bizz,
+                signer: await checkin.getGetBizzSigner(bizz)
+            }
+        })
     });
 });

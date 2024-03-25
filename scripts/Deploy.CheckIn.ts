@@ -1,6 +1,6 @@
-import { toNano } from '@ton/core';
-import { Checkin } from '../wrappers/Checkin';
-import { NetworkProvider } from '@ton/blueprint';
+import {toNano} from '@ton/core';
+import {Checkin} from '../wrappers/Checkin';
+import {NetworkProvider} from '@ton/blueprint';
 
 export async function run(provider: NetworkProvider) {
     const checkin = provider.open(await Checkin.fromInit());

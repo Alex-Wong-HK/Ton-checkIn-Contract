@@ -1,6 +1,6 @@
 import {address, Address, toNano} from '@ton/core';
-import { Checkin } from '../wrappers/Checkin';
-import { NetworkProvider, sleep } from '@ton/blueprint';
+import {Checkin} from '../wrappers/Checkin';
+import {NetworkProvider, sleep} from '@ton/blueprint';
 import {checkinContract} from "../contest/contractConifg";
 
 // Contract : EQAYSJrkETA-4gHDKk0po_eZ18iuk-fi2E1OgOiWmfpDDat5
